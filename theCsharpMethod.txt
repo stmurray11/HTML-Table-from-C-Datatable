@@ -1,0 +1,58 @@
+        public static void html_table_from_dt(ref DataTable dt, ref System.Text.StringBuilder sb, string sTableId = "",
+                                              int iPercentWidth = 0, string sTableClass = "table", bool bHeaderRow = true,
+                                              List<int> iArrColWidths = null, int iTableWidth = 0, string sListOfColsToCenter = "")
+        {
+            //begin table and create header row with col names
+            //if (iPercentWidth == 0) { iPercentWidth = 90;  }
+            sb.Append("<table class='" + sTableClass + "' ");
+            if (iArrColWidths == null && iPercentWidth != 0)
+            {
+                sb.Append("style = 'width:" + iPercentWidth.ToString() + "%;' "); 
+            }
+            else if (iTableWidth != 0 )
+            {
+                sb.Append("style = 'width:" + iTableWidth.ToString() + "px;' ");
+            }
+            if (sTableId.Length > 0) { sb.Append(" id='" + sTableId + "' ");  }
+            sb.Append(">");
+
+            //header row
+            string sStyle = "";
+            if (bHeaderRow)
+            {
+                sb.Append("<thead><tr>");
+                foreach (DataColumn col in dt.Columns) {
+                    sStyle = "";
+                    if (iArrColWidths != null && iArrColWidths.Count > 0)
+                    {
+                        sStyle = " style='width:" + iArrColWidths[0].ToString() + "px;'";
+                        iArrColWidths.RemoveAt(0);
+                    }
+                    sb.Append("<th " + sStyle + ">" + col.ColumnName + "</th>");
+                }
+                sb.Append("</tr></thead>");
+            }
+            //create data rows
+            foreach (DataRow dr in dt.Rows)
+            {
+                sb.Append("<tr>");
+                foreach (DataColumn col in dt.Columns) {
+                    sStyle = "";
+                    if (iArrColWidths != null && iArrColWidths.Count > 0)
+                    {
+                        sStyle = " style='width:" + iArrColWidths[0].ToString() + "px;'";
+                        iArrColWidths.RemoveAt(0);
+                    }
+                    if (sListOfColsToCenter.Contains(col.ColumnName))
+                    {
+                        if (sStyle.Length > 0) { sStyle = sStyle.Replace("style='", "style='text-align:center;"); }
+                        else { sStyle = "style='text-align:center;'"; }
+                    }
+                    sb.Append("<td " + sStyle + ">" + dr[col.ColumnName] + "</td>");
+                }
+                sb.Append("</tr>");
+            }
+            //close table
+            sb.Append("</table>");
+            return;
+        }
